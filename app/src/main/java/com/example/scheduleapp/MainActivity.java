@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
-    private final String GAS_URL = "https://script.google.com/macros/s/AKfycbzud3EM10DaGAhFsohYKe7eA8RI4LOwPv_r0tcYklQal05qzaQc9QuIrTddJIOBb0Vd2Q/exec";
+    private final String GAS_URL = "https://script.google.com/macros/s/AKfycbwzncswrdn5FtkvwjifAdJj-njIw-DlK6mRmeDlNKVNF-BQPVupPCUWHzqS29sQUrEk/exec";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
