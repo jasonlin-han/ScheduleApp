@@ -18,17 +18,18 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      with:
-        accept-android-sdk-licenses: true
-
     - name: Install Gradle
-      run: sudo apt-get update && sudo apt-get install -y gradle
-
-    - name: Build Debug APK
       run: |
-        gradle assembleDebug
+        sudo apt-get update
+        sudo apt-get install -y gradle
+
+    - name: Build APK
+      env:
+        ANDROID_HOME: /usr/local/lib/android/sdk
+      run: |
+        gradle wrapper
+        chmod +x gradlew
+        ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
