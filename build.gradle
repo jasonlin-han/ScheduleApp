@@ -3,10 +3,9 @@ buildscript {
         google()
         mavenCentral()
     }
-}
-
-plugins {
-    id 'com.android.application' version '8.2.0' apply false
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.0'
+    }
 }
 
 allprojects {
