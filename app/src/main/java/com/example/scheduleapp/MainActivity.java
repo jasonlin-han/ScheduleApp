@@ -25,9 +25,6 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDatabaseEnabled(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
-        webSettings.setSupportZoom(true);
-        webSettings.setBuiltInZoomControls(true);
-        webSettings.setDisplayZoomControls(false);
 
         String userAgent = webSettings.getUserAgentString();
         webSettings.setUserAgentString(userAgent.replace("; wv", ""));
