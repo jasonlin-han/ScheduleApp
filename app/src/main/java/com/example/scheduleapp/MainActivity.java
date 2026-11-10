@@ -19,16 +19,12 @@ public class MainActivity extends AppCompatActivity {
         webView = new WebView(this);
         setContentView(webView);
 
-       WebSettings webSettings = webView.getSettings();
-webSettings.setJavaScriptEnabled(true);
-webSettings.setDomStorageEnabled(true);
-webSettings.setDatabaseEnabled(true);
-
-webSettings.setSupportZoom(false);
-webSettings.setBuiltInZoomControls(false);
-webSettings.setDisplayZoomControls(false);
-webSettings.setUseWideViewPort(false);
-webSettings.setLoadWithOverviewMode(false);
+ WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
 
         String userAgent = webSettings.getUserAgentString();
         webSettings.setUserAgentString(userAgent.replace("; wv", ""));
