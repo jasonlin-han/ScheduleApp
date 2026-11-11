@@ -26,10 +26,14 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDatabaseEnabled(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
+        
+        // 確保支援快取與離線資料儲存，避免每次重啟被清空
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         String userAgent = webSettings.getUserAgentString();
         webSettings.setUserAgentString(userAgent.replace("; wv", ""));
 
+        // Cookie 設定與持久化
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
         cookieManager.setAcceptThirdPartyCookies(webView, true);
@@ -40,15 +44,38 @@ public class MainActivity extends AppCompatActivity {
                 view.loadUrl(url);
                 return true;
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // 每次頁面載入完成後，強制同步 Cookie 寫入儲存空間，防止手勢上一頁時 Token 遺失
+                CookieManager.getInstance().flush();
+            }
         });
-        webView.loadUrl(GAS_URL);
+
+        // 如果不是因為畫面重建（例如轉向），才載入首頁
+        if (savedInstanceState == null) {
+            webView.loadUrl(GAS_URL);
+        }
+    }
+
+    // 讓 WebView 在畫面因旋轉等狀況重建時能保留狀態
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        webView.saveState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        webView.restoreState(savedInstanceState);
     }
 
     @Override
     public void onBackPressed() {
         // 檢查 WebView 內是否還有上一頁
         if (webView != null && webView.canGoBack()) {
-            // 取得當前的歷史紀錄堆疊
             WebBackForwardList historyList = webView.copyBackForwardList();
             int currentIndex = historyList.getCurrentIndex();
             
@@ -56,11 +83,10 @@ public class MainActivity extends AppCompatActivity {
             if (currentIndex > 1) {
                 webView.goBackOrForward(-currentIndex); 
             } else {
-                // 如果剛好在第 1 層（首頁的下一頁），退回上一頁就會回到首頁
                 webView.goBack();
             }
         } else {
-            // 如果已經在首頁（無法再往回），則執行返回桌面，而不是直接關閉 App
+            // 如果已經在首頁，則執行返回桌面，而不是關閉 App
             moveTaskToBack(true);
         }
     }
