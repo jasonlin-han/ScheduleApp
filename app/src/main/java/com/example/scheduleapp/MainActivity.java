@@ -7,8 +7,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,14 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // 1. 如果側拉選單（Drawer）是開著的，先關閉選單（若日後有加 DrawerLayout 的話）
-        DrawerLayout drawer = findViewById(R.id.drawer_layout); 
-        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-            return;
-        }
-
-        // 2. 檢查 WebView 內是否還有上一頁
+        // 檢查 WebView 內是否還有上一頁
         if (webView != null && webView.canGoBack()) {
             // 取得當前的歷史紀錄堆疊
             WebBackForwardList historyList = webView.copyBackForwardList();
@@ -69,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 webView.goBack();
             }
         } else {
-            // 3. 如果已經在首頁（無法再往回），則執行返回桌面，而不是直接關閉 App
+            // 如果已經在首頁（無法再往回），則執行返回桌面，而不是直接關閉 App
             moveTaskToBack(true);
         }
     }
