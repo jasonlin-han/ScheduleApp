@@ -50,6 +50,29 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 // 每次頁面載入完成後，強制同步 Cookie 寫入儲存空間，防止手勢上一頁時 Token 遺失
                 CookieManager.getInstance().flush();
+
+                // 注入 JavaScript 隱藏 Google Apps Script 的頂端警告橫幅
+                String jsCode = "javascript:(function() {" +
+                        "function removeGasBanner() {" +
+                        "    var elements = document.querySelectorAll('div, span, p');" +
+                        "    for (var i = 0; i < elements.length; i++) {" +
+                        "        if (elements[i].innerText && elements[i].innerText.includes('這個應用程式是由 Google Apps Script')) {" +
+                        "            var target = elements[i].closest('div');" +
+                        "            if (target) { target.style.display = 'none'; return true; }" +
+                        "        }" +
+                        "    }" +
+                        "    return false;" +
+                        "}" +
+                        // 立即執行一次，若元素尚未生成則每 100ms 重試一次，直到成功隱藏
+                        "if (!removeGasBanner()) {" +
+                        "    var timer = setInterval(function() {" +
+                        "        if (removeGasBanner()) { clearInterval(timer); }" +
+                        "    }, 100);" +
+                        "    setTimeout(function() { clearInterval(timer); }, 3000);" + // 最多重試 3 秒
+                        "}" +
+                        "})();";
+                
+                view.loadUrl(jsCode);
             }
         });
 
