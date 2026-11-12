@@ -1,6 +1,7 @@
 package com.example.scheduleapp;
 
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -11,7 +12,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 建立根容器 FrameLayout，用來疊加 WebView 與載入畫面
+        // 建立根容器 FrameLayout
         rootLayout = new FrameLayout(this);
         setContentView(rootLayout);
 
-        // 1. 建立 WebView
+        // 1. 建立 WebView（底層載入網頁）
         webView = new WebView(this);
         FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -39,37 +39,40 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(webView, webParams);
 
-        // 2. 建立全螢幕載入畫面（覆蓋在最上層，遮蔽白屏）
+        // 2. 建立全螢幕載入畫面（完美遮蔽白屏與載入過程）
         loadingView = new LinearLayout(this);
         loadingView.setOrientation(LinearLayout.VERTICAL);
         loadingView.setGravity(Gravity.CENTER);
-        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 深色背景
+        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 沉穩深色背景
 
-        // ==================== Logo 圖片顯示 ====================
-        ImageView logoImageView = new ImageView(this);
-        // 確保你的 res/drawable 資料夾內有對應名稱的圖片 (例如 app_logo.png -> R.drawable.app_logo)
-        logoImageView.setImageResource(R.drawable.app_logo); 
-        
-        // 設定 Logo 大小（單位是像素 px）
-        int logoSize = 220; 
+        // ==================== 用純程式碼動態繪製專屬圖示 ====================
+        TextView logoIcon = new TextView(this);
+        logoIcon.setText("均"); // 系統代表字
+        logoIcon.setTextColor(Color.WHITE);
+        logoIcon.setTextSize(42);
+        logoIcon.setGravity(Gravity.CENTER);
+
+        // 動態產生圓角漸層背景（橘色系，呼應主視覺）
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setCornerRadius(45f); // 圓角弧度
+        drawable.setColor(Color.parseColor("#FF6F00")); // 均安系統代表橘色
+        logoIcon.setBackground(drawable);
+
+        int logoSize = 190; // 圖示尺寸 (像素)
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
-        logoParams.setMargins(0, 0, 0, 30); // 距離下方文字的間距
-        logoImageView.setLayoutParams(logoParams);
-        
-        // 讓圖片保持比例縮放
-        logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        loadingView.addView(logoImageView);
-        // ========================================================
+        logoParams.setMargins(0, 0, 0, 35);
+        logoIcon.setLayoutParams(logoParams);
+        loadingView.addView(logoIcon);
+        // ====================================================================
 
         // 系統名稱文字
         TextView titleText = new TextView(this);
         titleText.setText("均安服務員系統");
-        titleText.setTextColor(Color.WHITE);
+        titleText.setTextColor(Color.parseColor("#FFFFFF"));
         titleText.setTextSize(22);
         titleText.setGravity(Gravity.CENTER);
         loadingView.addView(titleText);
-
-        // （已移除轉圈圈 ProgressBar，畫面更乾淨俐落）
 
         FrameLayout.LayoutParams loadParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 CookieManager.getInstance().flush();
 
-                // 移除 Google Apps Script 警告橫幅的 JavaScript
+                // 自動移除 Google Apps Script 警告橫幅
                 String jsCode = "javascript:(function() {" +
                         "var divs = document.getElementsByTagName('div');" +
                         "for (var i = 0; i < divs.length; i++) {" +
@@ -122,14 +125,14 @@ public class MainActivity extends AppCompatActivity {
                         "})();";
                 view.loadUrl(jsCode);
 
-                // 稍微延遲 200 毫秒才淡出載入畫面，確保橫幅已經被 JS 徹底刪除且畫面完美銜接
+                // 網頁準備好後，快速且無縫地淡出載入畫面
                 if (loadingView != null && loadingView.getVisibility() == View.VISIBLE) {
                     loadingView.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             loadingView.animate()
                                     .alpha(0f)
-                                    .setDuration(250)
+                                    .setDuration(250) // 快速流暢的淡出時間
                                     .withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
@@ -138,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                                     })
                                     .start();
                         }
-                    }, 200);
+                    }, 150); // 微調等待時間，確保完美銜接
                 }
             }
         });
