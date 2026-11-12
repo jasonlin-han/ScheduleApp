@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
         
+        // 恢復為最穩定的預設載入模式，避免快取鎖死導致白屏卡死
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         String userAgent = webSettings.getUserAgentString();
@@ -48,39 +49,18 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 CookieManager.getInstance().flush();
 
-                // 升級版 JS：往上層尋找更完整的父容器，將整條橫幅連同按鈕區塊一次隱藏
+                // 安全且高效率地將整條 Google 警告橫幅（包含按鈕與文字）直接隱藏
                 String jsCode = "javascript:(function() {" +
-                        "if (window.gasBannerObserverInjected) return;" +
-                        "window.gasBannerObserverInjected = true;" +
-                        "function hideBanner() {" +
-                        "    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);" +
-                        "    while (walker.nextNode()) {" +
-                        "        if (walker.currentNode.nodeValue.includes('這個應用程式是由 Google Apps Script')) {" +
-                        "            var el = walker.currentNode.parentElement;" +
-                        "            var target = null;" +
-                        "            while (el && el !== document.body) {" +
-                        "                var text = el.innerText || '';" +
-                        "                if (text.includes('檢舉濫用情形') || text.includes('瞭解詳情') || el.offsetHeight < 200) {" +
-                        "                    target = el;" +
-                        "                } else {" +
-                        "                    break;" +
-                        "                }" +
-                        "                el = el.parentElement;" +
-                        "            }" +
-                        "            if (target) {" +
-                        "                target.style.display = 'none';" +
-                        "                return true;" +
-                        "            }" +
+                        "var banners = document.querySelectorAll('div');" +
+                        "for (var i = 0; i < banners.length; i++) {" +
+                        "    var text = banners[i].innerText || '';" +
+                        "    if (text.includes('這個應用程式是由 Google Apps Script') || text.includes('檢舉濫用情形')) {" +
+                        "        var el = banners[i];" +
+                        "        while (el && el.parentElement && el.parentElement !== document.body && el.parentElement.offsetHeight < 150) {" +
+                        "            el = el.parentElement;" +
                         "        }" +
+                        "        el.style.display = 'none';" +
                         "    }" +
-                        "    return false;" +
-                        "}" +
-                        "if (!hideBanner()) {" +
-                        "    var observer = new MutationObserver(function(mutations, obs) {" +
-                        "        if (hideBanner()) { obs.disconnect(); }" +
-                        "    });" +
-                        "    observer.observe(document.body, { childList: true, subtree: true });" +
-                        "    setTimeout(function() { observer.disconnect(); }, 2000);" +
                         "}" +
                         "})();";
                 
