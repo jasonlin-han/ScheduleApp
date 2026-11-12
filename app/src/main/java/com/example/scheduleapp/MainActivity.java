@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
         
-        // 確保支援快取與離線資料儲存，避免每次重啟被清空
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        // 關鍵修改：改用快取優先策略，大幅縮短載入等待時間
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 
         String userAgent = webSettings.getUserAgentString();
         webSettings.setUserAgentString(userAgent.replace("; wv", ""));
@@ -51,24 +51,33 @@ public class MainActivity extends AppCompatActivity {
                 // 每次頁面載入完成後，強制同步 Cookie 寫入儲存空間，防止手勢上一頁時 Token 遺失
                 CookieManager.getInstance().flush();
 
-                // 注入 JavaScript 隱藏 Google Apps Script 的頂端警告橫幅
+                // 注入 JavaScript 瞬間隱藏 Google Apps Script 的頂端警告橫幅
                 String jsCode = "javascript:(function() {" +
-                        "function removeGasBanner() {" +
-                        "    var elements = document.querySelectorAll('div, span, p');" +
-                        "    for (var i = 0; i < elements.length; i++) {" +
-                        "        if (elements[i].innerText && elements[i].innerText.includes('這個應用程式是由 Google Apps Script')) {" +
-                        "            var target = elements[i].closest('div');" +
-                        "            if (target) { target.style.display = 'none'; return true; }" +
+                        "if (window.gasBannerObserverInjected) return;" +
+                        "window.gasBannerObserverInjected = true;" +
+                        "function hideBanner() {" +
+                        "    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);" +
+                        "    while (walker.nextNode()) {" +
+                        "        if (walker.currentNode.nodeValue.includes('這個應用程式是由 Google Apps Script')) {" +
+                        "            var el = walker.currentNode.parentElement;" +
+                        "            while (el && el !== document.body && el.offsetHeight < 150) {" +
+                        "                var style = window.getComputedStyle(el);" +
+                        "                if (style.position === 'fixed' || style.position === 'absolute' || el.tagName === 'DIV') {" +
+                        "                    el.style.display = 'none';" +
+                        "                    return true;" +
+                        "                }" +
+                        "                el = el.parentElement;" +
+                        "            }" +
                         "        }" +
                         "    }" +
                         "    return false;" +
                         "}" +
-                        // 立即執行一次，若元素尚未生成則每 100ms 重試一次，直到成功隱藏
-                        "if (!removeGasBanner()) {" +
-                        "    var timer = setInterval(function() {" +
-                        "        if (removeGasBanner()) { clearInterval(timer); }" +
-                        "    }, 100);" +
-                        "    setTimeout(function() { clearInterval(timer); }, 3000);" + // 最多重試 3 秒
+                        "if (!hideBanner()) {" +
+                        "    var observer = new MutationObserver(function(mutations, obs) {" +
+                        "        if (hideBanner()) { obs.disconnect(); }" +
+                        "    });" +
+                        "    observer.observe(document.body, { childList: true, subtree: true });" +
+                        "    setTimeout(function() { observer.disconnect(); }, 2000);" +
                         "}" +
                         "})();";
                 
