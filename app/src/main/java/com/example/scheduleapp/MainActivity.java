@@ -1,33 +1,76 @@
 package com.example.scheduleapp;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+    private FrameLayout rootLayout;
+    private LinearLayout loadingView;
     private final String GAS_URL = "https://script.google.com/macros/s/AKfycbwzncswrdn5FtkvwjifAdJj-njIw-DlK6mRmeDlNKVNF-BQPVupPCUWHzqS29sQUrEk/exec";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        webView = new WebView(this);
-        setContentView(webView);
+        // 建立根容器 FrameLayout，用來疊加 WebView 與載入畫面
+        rootLayout = new FrameLayout(this);
+        setContentView(rootLayout);
 
+        // 1. 建立 WebView
+        webView = new WebView(this);
+        FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+        rootLayout.addView(webView, webParams);
+
+        // 2. 建立全螢幕載入畫面（覆蓋在最上層，遮蔽白屏）
+        loadingView = new LinearLayout(this);
+        loadingView.setOrientation(LinearLayout.VERTICAL);
+        loadingView.setGravity(Gravity.CENTER);
+        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 深色背景（呼應你的系統風格）
+
+        // 系統名稱文字
+        TextView titleText = new TextView(this);
+        titleText.setText("均安服務員系統");
+        titleText.setTextColor(Color.WHITE);
+        titleText.setTextSize(24);
+        titleText.setGravity(Gravity.CENTER);
+        titleText.setPadding(0, 0, 0, 30);
+        loadingView.addView(titleText);
+
+        // 讀取轉圈圈
+        ProgressBar progressBar = new ProgressBar(this);
+        loadingView.addView(progressBar);
+
+        FrameLayout.LayoutParams loadParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+        rootLayout.addView(loadingView, loadParams);
+
+        // WebView 基本設定
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setDatabaseEnabled(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
-        
-        // 恢復為最穩定的預設載入模式，避免快取鎖死導致白屏卡死
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         String userAgent = webSettings.getUserAgentString();
@@ -49,22 +92,36 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 CookieManager.getInstance().flush();
 
-                // 安全且高效率地將整條 Google 警告橫幅（包含按鈕與文字）直接隱藏
+                // 移除 Google Apps Script 警告橫幅的 JavaScript
                 String jsCode = "javascript:(function() {" +
-                        "var banners = document.querySelectorAll('div');" +
-                        "for (var i = 0; i < banners.length; i++) {" +
-                        "    var text = banners[i].innerText || '';" +
+                        "var divs = document.getElementsByTagName('div');" +
+                        "for (var i = 0; i < divs.length; i++) {" +
+                        "    var text = divs[i].innerText || '';" +
                         "    if (text.includes('這個應用程式是由 Google Apps Script') || text.includes('檢舉濫用情形')) {" +
-                        "        var el = banners[i];" +
-                        "        while (el && el.parentElement && el.parentElement !== document.body && el.parentElement.offsetHeight < 150) {" +
-                        "            el = el.parentElement;" +
+                        "        var target = divs[i];" +
+                        "        while (target && target.parentElement && target.parentElement !== document.body && target.parentElement.offsetHeight < 180) {" +
+                        "            target = target.parentElement;" +
                         "        }" +
-                        "        el.style.display = 'none';" +
+                        "        target.style.display = 'none';" +
+                        "        break;" +
                         "    }" +
                         "}" +
                         "})();";
-                
                 view.loadUrl(jsCode);
+
+                // 網頁載入完成且橫幅清除後，將載入畫面優雅地淡出隱藏
+                if (loadingView != null && loadingView.getVisibility() == View.VISIBLE) {
+                    loadingView.animate()
+                            .alpha(0f)
+                            .setDuration(400) // 淡出動畫持續 0.4 秒
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    loadingView.setVisibility(View.GONE);
+                                }
+                            })
+                            .start();
+                }
             }
         });
 
