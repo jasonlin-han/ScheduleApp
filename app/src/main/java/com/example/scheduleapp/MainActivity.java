@@ -27,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 建立根容器 FrameLayout
+        // 建立根容器 FrameLayout，用來疊加 WebView 與載入畫面
         rootLayout = new FrameLayout(this);
         setContentView(rootLayout);
 
-        // 1. 建立 WebView（先載入在底層）
+        // 1. 建立 WebView
         webView = new WebView(this);
         FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -39,30 +39,37 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(webView, webParams);
 
-        // 2. 建立精簡流暢的專屬載入畫面（直接對應 Logo 視覺，無縫接軌）
+        // 2. 建立全螢幕載入畫面（覆蓋在最上層，遮蔽白屏）
         loadingView = new LinearLayout(this);
         loadingView.setOrientation(LinearLayout.VERTICAL);
         loadingView.setGravity(Gravity.CENTER);
-        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 沉穩深色背景
+        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 深色背景
 
-        // Logo 圖片顯示
+        // ==================== Logo 圖片顯示 ====================
         ImageView logoImageView = new ImageView(this);
-        logoImageView.setImageResource(R.drawable.app_logo); // 確保 drawable 裡有這張圖
+        // 確保你的 res/drawable 資料夾內有對應名稱的圖片 (例如 app_logo.png -> R.drawable.app_logo)
+        logoImageView.setImageResource(R.drawable.app_logo); 
         
-        int logoSize = 220; // 調整 Logo 大小
+        // 設定 Logo 大小（單位是像素 px）
+        int logoSize = 220; 
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
-        logoParams.setMargins(0, 0, 0, 30);
+        logoParams.setMargins(0, 0, 0, 30); // 距離下方文字的間距
         logoImageView.setLayoutParams(logoParams);
+        
+        // 讓圖片保持比例縮放
         logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         loadingView.addView(logoImageView);
+        // ========================================================
 
         // 系統名稱文字
         TextView titleText = new TextView(this);
         titleText.setText("均安服務員系統");
-        titleText.setTextColor(Color.parseColor("#FFFFFF"));
+        titleText.setTextColor(Color.WHITE);
         titleText.setTextSize(22);
         titleText.setGravity(Gravity.CENTER);
         loadingView.addView(titleText);
+
+        // （已移除轉圈圈 ProgressBar，畫面更乾淨俐落）
 
         FrameLayout.LayoutParams loadParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -70,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(loadingView, loadParams);
 
-        // WebView 設定
+        // WebView 基本設定
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -98,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 CookieManager.getInstance().flush();
 
-                // 移除 Google Apps Script 警告橫幅
+                // 移除 Google Apps Script 警告橫幅的 JavaScript
                 String jsCode = "javascript:(function() {" +
                         "var divs = document.getElementsByTagName('div');" +
                         "for (var i = 0; i < divs.length; i++) {" +
@@ -115,14 +122,14 @@ public class MainActivity extends AppCompatActivity {
                         "})();";
                 view.loadUrl(jsCode);
 
-                // 網頁載入完成後快速俐落切換，不拖泥帶水
+                // 稍微延遲 200 毫秒才淡出載入畫面，確保橫幅已經被 JS 徹底刪除且畫面完美銜接
                 if (loadingView != null && loadingView.getVisibility() == View.VISIBLE) {
                     loadingView.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             loadingView.animate()
                                     .alpha(0f)
-                                    .setDuration(250) // 縮短淡出時間，讓切換更快
+                                    .setDuration(250)
                                     .withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
@@ -131,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                                     })
                                     .start();
                         }
-                    }, 150); // 縮短等待時間，提升開啟速度感
+                    }, 200);
                 }
             }
         });
