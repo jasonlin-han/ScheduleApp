@@ -11,8 +11,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 建立根容器 FrameLayout，用來疊加 WebView 與載入畫面
+        // 建立根容器 FrameLayout
         rootLayout = new FrameLayout(this);
         setContentView(rootLayout);
 
-        // 1. 建立 WebView
+        // 1. 建立 WebView（先載入在底層）
         webView = new WebView(this);
         FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -39,24 +39,30 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(webView, webParams);
 
-        // 2. 建立全螢幕載入畫面（覆蓋在最上層，遮蔽白屏）
+        // 2. 建立精簡流暢的專屬載入畫面（直接對應 Logo 視覺，無縫接軌）
         loadingView = new LinearLayout(this);
         loadingView.setOrientation(LinearLayout.VERTICAL);
         loadingView.setGravity(Gravity.CENTER);
-        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 深色背景（呼應你的系統風格）
+        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 沉穩深色背景
+
+        // Logo 圖片顯示
+        ImageView logoImageView = new ImageView(this);
+        logoImageView.setImageResource(R.drawable.app_logo); // 確保 drawable 裡有這張圖
+        
+        int logoSize = 220; // 調整 Logo 大小
+        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
+        logoParams.setMargins(0, 0, 0, 30);
+        logoImageView.setLayoutParams(logoParams);
+        logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        loadingView.addView(logoImageView);
 
         // 系統名稱文字
         TextView titleText = new TextView(this);
         titleText.setText("均安服務員系統");
-        titleText.setTextColor(Color.WHITE);
-        titleText.setTextSize(24);
+        titleText.setTextColor(Color.parseColor("#FFFFFF"));
+        titleText.setTextSize(22);
         titleText.setGravity(Gravity.CENTER);
-        titleText.setPadding(0, 0, 0, 30);
         loadingView.addView(titleText);
-
-        // 讀取轉圈圈
-        ProgressBar progressBar = new ProgressBar(this);
-        loadingView.addView(progressBar);
 
         FrameLayout.LayoutParams loadParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(loadingView, loadParams);
 
-        // WebView 基本設定
+        // WebView 設定
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -92,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 CookieManager.getInstance().flush();
 
-                // 移除 Google Apps Script 警告橫幅的 JavaScript
+                // 移除 Google Apps Script 警告橫幅
                 String jsCode = "javascript:(function() {" +
                         "var divs = document.getElementsByTagName('div');" +
                         "for (var i = 0; i < divs.length; i++) {" +
@@ -109,18 +115,23 @@ public class MainActivity extends AppCompatActivity {
                         "})();";
                 view.loadUrl(jsCode);
 
-                // 網頁載入完成且橫幅清除後，將載入畫面優雅地淡出隱藏
+                // 網頁載入完成後快速俐落切換，不拖泥帶水
                 if (loadingView != null && loadingView.getVisibility() == View.VISIBLE) {
-                    loadingView.animate()
-                            .alpha(0f)
-                            .setDuration(400) // 淡出動畫持續 0.4 秒
-                            .withEndAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    loadingView.setVisibility(View.GONE);
-                                }
-                            })
-                            .start();
+                    loadingView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingView.animate()
+                                    .alpha(0f)
+                                    .setDuration(250) // 縮短淡出時間，讓切換更快
+                                    .withEndAction(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            loadingView.setVisibility(View.GONE);
+                                        }
+                                    })
+                                    .start();
+                        }
+                    }, 150); // 縮短等待時間，提升開啟速度感
                 }
             }
         });
