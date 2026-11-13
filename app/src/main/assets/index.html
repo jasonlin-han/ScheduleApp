@@ -1,6 +1,19 @@
-/* 請根據你圖片的 ID 或 class 進行調整 */
-#logo, .loading-logo, .splash-screen img {
-    width: 220px !important; /* 數字可以自己調大或調小 */
-    height: auto !important;  /* 自動維持圖片長寬比例，不變形 */
-    max-width: 70vw !important; /* 確保在手機螢幕上不會超出邊界 */
-}
+<style>
+    /* 讓載入畫面的背景維持你的深色風格 */
+    #splash-screen, .splash-screen, body {
+        background-color: #121212; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    /* 強制將 Logo 放大到指定寬度，並保持比例 */
+    img[src*="logo"], .loading-logo, #logo {
+        width: 220px !important;    /* 這裡可以改成 240px 或 260px 讓它更大 */
+        height: auto !important;     /* 自動維持長寬比例，絕對不變形 */
+        max-width: 60vw !important;  /* 限制在手機螢幕寬度的 60% 以內 */
+        display: block !important;
+    }
+</style>
