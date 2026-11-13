@@ -1,6 +1,7 @@
 package com.example.scheduleapp;
 
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -11,8 +12,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,25 +39,40 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(webView, webParams);
 
-        // 2. 建立全螢幕載入畫面（背景設為指定的 #0d1117）
+        // 2. 建立全螢幕載入畫面（完美遮蔽白屏與載入過程）
         loadingView = new LinearLayout(this);
         loadingView.setOrientation(LinearLayout.VERTICAL);
         loadingView.setGravity(Gravity.CENTER);
-        loadingView.setBackgroundColor(Color.parseColor("#0d1117"));
+        loadingView.setBackgroundColor(Color.parseColor("#121212")); // 沉穩深色背景
 
-        // ==================== 載入你上傳的 Logo 圖片 ====================
-        ImageView logoImageView = new ImageView(this);
-        logoImageView.setImageResource(R.drawable.app_logo); // 對應 drawable/app_logo.png
-        
-        // 設定 Logo 顯示大小 (像素尺寸，可依畫面效果微調，例如 260 或 280)
-        int logoSize = 280; 
+        // ==================== 用純程式碼動態繪製專屬圖示 ====================
+        TextView logoIcon = new TextView(this);
+        logoIcon.setText("均"); // 系統代表字
+        logoIcon.setTextColor(Color.WHITE);
+        logoIcon.setTextSize(42);
+        logoIcon.setGravity(Gravity.CENTER);
+
+        // 動態產生圓角漸層背景（橘色系，呼應主視覺）
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setCornerRadius(45f); // 圓角弧度
+        drawable.setColor(Color.parseColor("#FF6F00")); // 均安系統代表橘色
+        logoIcon.setBackground(drawable);
+
+        int logoSize = 190; // 圖示尺寸 (像素)
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
-        logoImageView.setLayoutParams(logoParams);
-        
-        // 保持圖片比例置中縮放
-        logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        loadingView.addView(logoImageView);
-        // ==========================================================
+        logoParams.setMargins(0, 0, 0, 35);
+        logoIcon.setLayoutParams(logoParams);
+        loadingView.addView(logoIcon);
+        // ====================================================================
+
+        // 系統名稱文字
+        TextView titleText = new TextView(this);
+        titleText.setText("均安服務員系統");
+        titleText.setTextColor(Color.parseColor("#FFFFFF"));
+        titleText.setTextSize(22);
+        titleText.setGravity(Gravity.CENTER);
+        loadingView.addView(titleText);
 
         FrameLayout.LayoutParams loadParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -146,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         webView.restoreState(savedInstanceState);
     }
- 
+
     @Override
     public void onBackPressed() {
         if (webView != null && webView.canGoBack()) {
