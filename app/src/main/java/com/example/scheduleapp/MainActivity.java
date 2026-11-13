@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         
         // 設定 Logo 顯示大小 (像素尺寸，可依畫面效果微調，例如 260 或 280)
         int logoSize = 480; 
+        // Force rebuild trigger: update logo size to 480px 
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
         logoImageView.setLayoutParams(logoParams);
         
