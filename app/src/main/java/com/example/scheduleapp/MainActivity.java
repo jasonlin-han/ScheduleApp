@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         logoImageView.setImageResource(R.drawable.app_logo); // 對應 drawable/app_logo.png
         
         // 設定 Logo 顯示大小 (像素尺寸，可依畫面效果微調，例如 260 或 280)
-        int logoSize = 380; 
+        int logoSize = 480; 
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
         logoImageView.setLayoutParams(logoParams);
         
