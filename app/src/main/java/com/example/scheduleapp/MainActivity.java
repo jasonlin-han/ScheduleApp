@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         loadingView = new LinearLayout(this);
         loadingView.setOrientation(LinearLayout.VERTICAL);
         loadingView.setGravity(Gravity.CENTER);
-        loadingView.setBackgroundColor(Color.parseColor("#0d1117"));
+        loadingView.setBackgroundColor(Color.parseColor("#2B2321"));
 
         // ==================== 載入你上傳的 Logo 圖片 ====================
         ImageView logoImageView = new ImageView(this);
