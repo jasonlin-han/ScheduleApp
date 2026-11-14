@@ -29,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
         // 建立根容器 FrameLayout
         rootLayout = new FrameLayout(this);
         setContentView(rootLayout);
+        
+        // ⚡ 【新增這行】直接讓最底層根容器一開始就是深夜暖可可色，徹底消除啟動時的白屏閃爍
+        rootLayout.setBackgroundColor(Color.parseColor("#2B2321"));
 
         // 1. 建立 WebView（底層載入網頁）
         webView = new WebView(this);
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(webView, webParams);
 
-        // 2. 建立全螢幕載入畫面（背景設為指定的 #0d1117）
+        // 2. 建立全螢幕載入畫面（背景設為指定的 #2B2321）
         loadingView = new LinearLayout(this);
         loadingView.setOrientation(LinearLayout.VERTICAL);
         loadingView.setGravity(Gravity.CENTER);
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView logoImageView = new ImageView(this);
         logoImageView.setImageResource(R.drawable.app_logo); // 對應 drawable/app_logo.png
         
-        // 設定 Logo 顯示大小 (像素尺寸，可依畫面效果微調，例如 260 或 280)
+        // 設定 Logo 顯示大小 (像素尺寸，可依畫面效果微調)
         int logoSize = 650; 
         // Force rebuild trigger: update logo size to 650px 
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
