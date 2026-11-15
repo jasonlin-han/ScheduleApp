@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         rootLayout = new FrameLayout(this);
         setContentView(rootLayout);
         
-        // ⚡ 【新增這行】直接讓最底層根容器一開始就是深夜暖可可色，徹底消除啟動時的白屏閃爍
+        // 讓最底層根容器一開始就是深夜暖可可色
         rootLayout.setBackgroundColor(Color.parseColor("#2B2321"));
 
         // 1. 建立 WebView（底層載入網頁）
@@ -39,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         );
+        
+        // ⚡ 【關鍵修正】直接把 WebView 本身的背景也設為同款咖啡色，徹底消除載入時的白屏閃爍
+        webView.setBackgroundColor(Color.parseColor("#2B2321"));
+        
         rootLayout.addView(webView, webParams);
 
         // 2. 建立全螢幕載入畫面（背景設為指定的 #2B2321）
@@ -51,13 +55,10 @@ public class MainActivity extends AppCompatActivity {
         ImageView logoImageView = new ImageView(this);
         logoImageView.setImageResource(R.drawable.app_logo); // 對應 drawable/app_logo.png
         
-        // 設定 Logo 顯示大小 (像素尺寸，可依畫面效果微調)
         int logoSize = 650; 
-        // Force rebuild trigger: update logo size to 650px 
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
         logoImageView.setLayoutParams(logoParams);
         
-        // 保持圖片比例置中縮放
         logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         loadingView.addView(logoImageView);
         // ==========================================================
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             loadingView.animate()
                                     .alpha(0f)
-                                    .setDuration(250) // 快速流暢的淡出時間
+                                    .setDuration(250)
                                     .withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                                     })
                                     .start();
                         }
-                    }, 150); // 微調等待時間，確保完美銜接
+                    }, 150);
                 }
             }
         });
@@ -152,17 +153,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            WebBackForwardList historyList = webView.copyBackForwardList();
-            int currentIndex = historyList.getCurrentIndex();
-            if (currentIndex > 1) {
-                webView.goBackOrForward(-currentIndex); 
-            } else {
-                webView.goBack();
-            }
-        } else {
-            moveTaskToBack(true);
-        }
-    }
-}
