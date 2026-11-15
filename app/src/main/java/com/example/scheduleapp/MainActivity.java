@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT
         );
         
-        // ⚡ 【關鍵修正】直接把 WebView 本身的背景也設為同款咖啡色，徹底消除載入時的白屏閃爍
+        // ⚡ 直接把 WebView 本身的背景也設為同款咖啡色，徹底消除載入時的白屏閃爍
         webView.setBackgroundColor(Color.parseColor("#2B2321"));
         
         rootLayout.addView(webView, webParams);
@@ -87,69 +87,4 @@ public class MainActivity extends AppCompatActivity {
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                CookieManager.getInstance().flush();
-
-                // 自動移除 Google Apps Script 警告橫幅
-                String jsCode = "javascript:(function() {" +
-                        "var divs = document.getElementsByTagName('div');" +
-                        "for (var i = 0; i < divs.length; i++) {" +
-                        "    var text = divs[i].innerText || '';" +
-                        "    if (text.includes('這個應用程式是由 Google Apps Script') || text.includes('檢舉濫用情形')) {" +
-                        "        var target = divs[i];" +
-                        "        while (target && target.parentElement && target.parentElement !== document.body && target.parentElement.offsetHeight < 180) {" +
-                        "            target = target.parentElement;" +
-                        "        }" +
-                        "        target.style.display = 'none';" +
-                        "        break;" +
-                        "    }" +
-                        "}" +
-                        "})();";
-                view.loadUrl(jsCode);
-
-                // 網頁準備好後，快速且無縫地淡出載入畫面
-                if (loadingView != null && loadingView.getVisibility() == View.VISIBLE) {
-                    loadingView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadingView.animate()
-                                    .alpha(0f)
-                                    .setDuration(250)
-                                    .withEndAction(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            loadingView.setVisibility(View.GONE);
-                                        }
-                                    })
-                                    .start();
-                        }
-                    }, 150);
-                }
-            }
-        });
-
-        if (savedInstanceState == null) {
-            webView.loadUrl(GAS_URL);
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        webView.saveState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        webView.restoreState(savedInstanceState);
-    }
-
-    @Override
+            public boolean
