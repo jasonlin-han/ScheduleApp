@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT
         );
         
-        // 直接把 WebView 本身的背景也設為同款咖啡色，徹底消除載入時的白屏閃爍
-        webView.setBackgroundColor(Color.parseColor("#2B2321"));
+       // ⚡ 將 WebView 背景設為透明，直接透出下方容器的 #2B2321 咖啡色
+        webView.setBackgroundColor(Color.TRANSPARENT);
         
         rootLayout.addView(webView, webParams);
 
