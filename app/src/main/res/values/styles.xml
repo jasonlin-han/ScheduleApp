@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 定義您的深色/咖啡色主題 -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- 將預設的視窗背景改成您的咖啡色系色碼（請自行替換為您的實際顏色） -->
+    <!-- 將 parent 改為不帶 Light 的版本，這樣 windowBackground 才會生效 -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- 將預設的視窗背景改成您的咖啡色 -->
         <item name="android:windowBackground">#2D231E</item>
     </style>
 </resources>
