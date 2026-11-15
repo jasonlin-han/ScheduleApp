@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <!-- ⚡ 強制指定系統原生視窗啟動背景為深夜暖可可色 -->
+        <!-- 1. 傳統 Android 視窗背景色 -->
         <item name="android:windowBackground">#2B2321</item>
         <item name="android:colorBackground">#2B2321</item>
+
+        <!-- 2. 針對 Android 12+ (API 31+) 的官方 Splash Screen 啟動畫面設定 -->
+        <item name="android:windowSplashScreenBackground">#2B2321</item>
     </style>
 </resources>
