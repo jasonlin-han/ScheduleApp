@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // ⚡ 關閉系統預設的 Activity 縮放轉場動畫，避免桌面圖示被一起拉大
+        overridePendingTransition(0, 0);
+
         // 建立根容器 FrameLayout
         rootLayout = new FrameLayout(this);
         setContentView(rootLayout);
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         loadingView.setGravity(Gravity.CENTER);
         loadingView.setBackgroundColor(Color.parseColor("#2B2321"));
 
-        // ==================== 載入 Logo 圖片並套用精緻開場動畫 ====================
+        // ==================== 載入 Logo 圖片並套用極致流暢的開場動畫 ====================
         ImageView logoImageView = new ImageView(this);
         logoImageView.setImageResource(R.drawable.app_logo); // 對應 drawable/app_logo.png
         
@@ -60,18 +63,19 @@ public class MainActivity extends AppCompatActivity {
         logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         loadingView.addView(logoImageView);
 
-        // 🚀 套用您指定的原生縮放與淡入動畫
-        logoImageView.setScaleX(0.3f);
-        logoImageView.setScaleY(0.3f);
+        // 🚀 設定起始狀態（稍微縮小且透明）
+        logoImageView.setScaleX(0.7f);
+        logoImageView.setScaleY(0.7f);
         logoImageView.setAlpha(0f);
 
+        // 執行更柔和、流暢的放大與淡入動畫（0.8秒，營造高級感，無頓點）
         logoImageView.animate()
-                .scaleX(1.0f) // 放大到正常大小
+                .scaleX(1.0f)
                 .scaleY(1.0f)
-                .alpha(1.0f)  // 淡入顯現
-                .setDuration(600) // 動畫持續 0.6 秒，滑順有質感
+                .alpha(1.0f)
+                .setDuration(800) 
                 .start();
-        // ====================================================================
+        // ==========================================================================
 
         FrameLayout.LayoutParams loadParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -124,14 +128,14 @@ public class MainActivity extends AppCompatActivity {
                         "})();";
                 view.loadUrl(jsCode);
 
-                // 網頁準備好後，快速且無縫地淡出載入畫面
+                // 網頁準備好後，完美銜接 Logo 動畫，優雅地淡出載入畫面
                 if (loadingView != null && loadingView.getVisibility() == View.VISIBLE) {
                     loadingView.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             loadingView.animate()
                                     .alpha(0f)
-                                    .setDuration(250) // 快速流暢的淡出時間
+                                    .setDuration(350) // 柔和的淡出秒數
                                     .withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                                     })
                                     .start();
                         }
-                    }, 150); // 微調等待時間，確保完美銜接
+                    }, 400); // 確保 Logo 動畫完整呈現後再淡入主畫面
                 }
             }
         });
@@ -148,6 +152,12 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             webView.loadUrl(GAS_URL);
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
     }
 
     @Override
