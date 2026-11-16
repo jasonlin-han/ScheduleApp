@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         rootLayout = new FrameLayout(this);
         setContentView(rootLayout);
         
-        // 讓最底層根容器一開始就是深夜暖可可色
+        // 直接讓最底層根容器一開始就是深夜暖可可色 (#2B2321)，徹底消除白屏閃爍
         rootLayout.setBackgroundColor(Color.parseColor("#2B2321"));
 
         // 1. 建立 WebView（底層載入網頁）
@@ -39,10 +39,6 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         );
-        
-       // ⚡ 將 WebView 背景設為透明，直接透出下方容器的 #2B2321 咖啡色
-        webView.setBackgroundColor(Color.TRANSPARENT);
-        
         rootLayout.addView(webView, webParams);
 
         // 2. 建立全螢幕載入畫面（背景設為指定的 #2B2321）
@@ -51,17 +47,31 @@ public class MainActivity extends AppCompatActivity {
         loadingView.setGravity(Gravity.CENTER);
         loadingView.setBackgroundColor(Color.parseColor("#2B2321"));
 
-        // ==================== 載入 Logo 圖片 ====================
+        // ==================== 載入 Logo 圖片並套用精緻開場動畫 ====================
         ImageView logoImageView = new ImageView(this);
         logoImageView.setImageResource(R.drawable.app_logo); // 對應 drawable/app_logo.png
         
+        // 設定 Logo 顯示大小
         int logoSize = 650; 
         LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(logoSize, logoSize);
         logoImageView.setLayoutParams(logoParams);
         
+        // 保持圖片比例置中縮放
         logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         loadingView.addView(logoImageView);
-        // ==========================================================
+
+        // 🚀 套用您指定的原生縮放與淡入動畫
+        logoImageView.setScaleX(0.3f);
+        logoImageView.setScaleY(0.3f);
+        logoImageView.setAlpha(0f);
+
+        logoImageView.animate()
+                .scaleX(1.0f) // 放大到正常大小
+                .scaleY(1.0f)
+                .alpha(1.0f)  // 淡入顯現
+                .setDuration(600) // 動畫持續 0.6 秒，滑順有質感
+                .start();
+        // ====================================================================
 
         FrameLayout.LayoutParams loadParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -121,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             loadingView.animate()
                                     .alpha(0f)
-                                    .setDuration(250)
+                                    .setDuration(250) // 快速流暢的淡出時間
                                     .withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
@@ -130,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                                     })
                                     .start();
                         }
-                    }, 150);
+                    }, 150); // 微調等待時間，確保完美銜接
                 }
             }
         });
