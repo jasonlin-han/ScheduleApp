@@ -64,15 +64,15 @@ public class MainActivity extends AppCompatActivity {
         loadingView.addView(logoImageView);
 
         // 🚀 設為更小的起始值（0.4f），營造從遠處向鏡頭「拉近放大」的強烈視覺效果
-        logoImageView.setScaleX(0.4f);
-        logoImageView.setScaleY(0.4f);
+        logoImageView.setScaleX(0.9f);
+        logoImageView.setScaleY(0.9f);
         logoImageView.setAlpha(0f);
 
         // 執行滑順且張力十足的放大與淡入動畫（0.8秒）
         logoImageView.animate()
-                .scaleX(1.0f)
-                .scaleY(1.0f)
-                .alpha(1.0f)
+                .scaleX(1.2f)
+                .scaleY(1.2f)
+                .alpha(1.2f)
                 .setDuration(800) 
                 .start();
         // ==========================================================================
