@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         loadingView.setGravity(Gravity.CENTER);
         loadingView.setBackgroundColor(Color.parseColor("#2B2321"));
 
-        // ==================== 載入 Logo 圖片並套用極致流暢的開場動畫 ====================
+        // ==================== 載入 Logo 圖片並套用強烈的拉近放大動畫 ====================
         ImageView logoImageView = new ImageView(this);
         logoImageView.setImageResource(R.drawable.app_logo); // 對應 drawable/app_logo.png
         
@@ -63,12 +63,12 @@ public class MainActivity extends AppCompatActivity {
         logoImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         loadingView.addView(logoImageView);
 
-        // 🚀 設定起始狀態（稍微縮小且透明）
-        logoImageView.setScaleX(0.7f);
-        logoImageView.setScaleY(0.7f);
+        // 🚀 設為更小的起始值（0.4f），營造從遠處向鏡頭「拉近放大」的強烈視覺效果
+        logoImageView.setScaleX(0.4f);
+        logoImageView.setScaleY(0.4f);
         logoImageView.setAlpha(0f);
 
-        // 執行更柔和、流暢的放大與淡入動畫（0.8秒，營造高級感，無頓點）
+        // 執行滑順且張力十足的放大與淡入動畫（0.8秒）
         logoImageView.animate()
                 .scaleX(1.0f)
                 .scaleY(1.0f)
@@ -128,14 +128,14 @@ public class MainActivity extends AppCompatActivity {
                         "})();";
                 view.loadUrl(jsCode);
 
-                // 網頁準備好後，完美銜接 Logo 動畫，優雅地淡出載入畫面
+                // 網頁準備好後，完美銜接動畫，優雅地淡出載入畫面
                 if (loadingView != null && loadingView.getVisibility() == View.VISIBLE) {
                     loadingView.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             loadingView.animate()
                                     .alpha(0f)
-                                    .setDuration(350) // 柔和的淡出秒數
+                                    .setDuration(350)
                                     .withEndAction(new Runnable() {
                                         @Override
                                         public void run() {
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                                     })
                                     .start();
                         }
-                    }, 400); // 確保 Logo 動畫完整呈現後再淡入主畫面
+                    }, 400);
                 }
             }
         });
